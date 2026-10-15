@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Controle de Vendas Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --card-border: #2a2a2a;
+      --text-main: #ffffff;
+      --text-muted: #9e9e9e;
+      --primary-color: #00aaff;
+      --primary-hover: #0088cc;
+      --green-paid: #00e676;
+      --danger-red: #ff5252;
+      --header-bg: #181818;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      background-color: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    /* Top Bar */
+    .top-bar {
+      background-color: var(--header-bg);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .top-bar .title-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .top-bar .back-btn, .top-bar .action-icon-btn {
+      background: none;
+      border: none;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .top-bar h1 {
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .top-bar .save-btn {
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 15px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Navegação Inferior / Abas */
+    .nav-bottom {
+      background-color: var(--header-bg);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 4px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+    }
+
+    .nav-item {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .nav-item.active {
+      color: var(--primary-color);
+      font-weight: 700;
+    }
+
+    /* Conteúdo Principal */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      padding-bottom: 80px;
+    }
+
+    /* Cards e Seções */
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      background: var(--card-bg);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
+
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid var(--primary-color);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .profile-info h2 {
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .profile-info p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .btn-action-primary {
+      width: 100%;
+      background-color: var(--primary-color);
+      color: #ffffff;
+      border: none;
+      border-radius: 28px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .filter-bar select {
+      background: transparent;
+      color: var(--text-main);
+      border: none;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .summary-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid var(--card-border);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    .summary-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .summary-label {
+      color: var(--text-muted);
+    }
+
+    .summary-value {
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .summary-row.clickable {
+      cursor: pointer;
+      color: var(--primary-color);
+      padding: 4px 0;
+    }
+    .summary-row.clickable:hover {
+      text-decoration: underline;
+    }
+
+    /* Listas */
+    .item-card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--card-border);
+      position: relative;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .item-date {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .item-status {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .item-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .item-value {
+      color: var(--green-paid);
+      font-weight: 700;
+      margin-left: auto;
+    }
+
+    .item-desc {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--card-border);
+      justify-content: flex-end;
+    }
+
+    .card-btn-action {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .btn-edit { color: var(--primary-color); }
+    .btn-delete { color: var(--danger-red); }
+
+    /* Botão Flutuante */
+    .fab {
+      position: absolute;
+      bottom: 76px;
+      right: 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 28px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      cursor: pointer;
+      z-index: 40;
+    }
+
+    /* Formulários e Inputs */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-box {
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 14px;
+      cursor: pointer;
+      background: var(--card-bg);
+    }
+
+    .form-box-title {
+      color: var(--primary-color);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .form-box-value {
+      color: var(--text-main);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .custom-input-box {
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 10px;
+      background: var(--card-bg);
+      width: 100%;
+    }
+
+    .custom-input-box input, .custom-input-box select {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 16px;
+      outline: none;
+    }
+
+    .form-label {
+      color: var(--primary-color);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .radio-option input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary-color);
+    }
+
+    .text-area-box, .input-underline {
+      width: 100%;
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 12px;
+      color: var(--text-main);
+      font-size: 15px;
+      outline: none;
+    }
+
+    .input-underline {
+      border: none;
+      border-bottom: 1px solid var(--text-muted);
+      border-radius: 0;
+      padding: 8px 0;
+      margin-bottom: 16px;
+      background: transparent;
+    }
+
+    .input-underline:focus {
+      border-bottom-color: var(--primary-color);
+    }
+
+    /* Modais */
+    .modal-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 20px;
+      border: 1px solid var(--card-border);
+    }
+
+    .modal-card h3 {
+      margin-bottom: 16px;
+      color: var(--primary-color);
+    }
+
+    .select-item {
+      padding: 12px;
+      border-bottom: 1px solid var(--card-border);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .select-item:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container" id="app-container">
+    
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="title-section">
+        <button class="back-btn hidden" id="back-btn" onclick="voltarTelaAnterior()">
+          <i data-lucide="arrow-left"></i>
+        </button>
+        <h1 id="app-title">Controle de Vendas Pro</h1>
+      </div>
+      <button class="save-btn hidden" id="save-btn" onclick="salvarFormularioAtual()">SALVAR</button>
+    </div>
+
+    <!-- Conteúdo Dinâmico -->
+    <div class="content">
+
+      <!-- 1. ABA INÍCIO / DASHBOARD -->
+      <div id="tab-inicio" class="tab-content">
+        <div class="profile-card" onclick="abrirConfiguracoes()">
+          <div class="avatar" id="dash-avatar" style="background-image: url('https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=150&auto=format&fit=crop&q=80');"></div>
+          <div class="profile-info">
+            <h2 id="dash-empresa-nome">B&D Instalação</h2>
+            <p id="dash-dono-nome">Dono: Davi</p>
+          </div>
+        </div>
+
+        <button class="btn-action-primary" onclick="abrirCadastroVenda()">
+          <i data-lucide="plus-circle"></i> NOVA VENDA
+        </button>
+
+        <div class="filter-bar">
+          <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="calendar" style="width:16px;"></i> Período:</span>
+          <select id="select-periodo" onchange="renderizarDashboard()">
+            <option value="todos">Todo o período</option>
+            <option value="dia">Hoje</option>
+            <option value="semana">Esta semana</option>
+            <option value="mes">Este mês</option>
+            <option value="ano">Este ano</option>
+          </select>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Total de vendas</span>
+            <span class="summary-value" id="dash-total-vendas">0</span>
+          </div>
+          <div class="summary-row clickable" onclick="abrirModalPendentes()">
+            <span class="summary-label">Pendentes de pagamento 📋</span>
+            <span class="summary-value" id="dash-pendentes" style="color: var(--danger-red); font-weight:700;">0</span>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Faturamento total</span>
+            <span class="summary-value" id="dash-faturamento">R$ 0,00</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Custos</span>
+            <span class="summary-value" id="dash-custos">R$ 0,00</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Lucro</span>
+            <span class="summary-value" id="dash-lucro">R$ 0,00</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Valor pendente</span>
+            <span class="summary-value" id="dash-valor-pendente">R$ 0,00</span>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Total de clientes</span>
+            <span class="summary-value" id="dash-total-clientes">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Clientes pendentes</span>
+            <span class="summary-value" id="dash-clientes-pendentes">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. ABA CLIENTES -->
+      <div id="tab-clientes" class="tab-content hidden">
+        <div id="clientes-list"></div>
+        <button class="fab" onclick="abrirCadastroCliente()">
+          <i data-lucide="user-plus"></i> NOVO CLIENTE
+        </button>
+      </div>
+
+      <!-- 3. ABA VENDAS -->
+      <div id="tab-vendas" class="tab-content hidden">
+        <div id="vendas-list"></div>
+        <button class="fab" onclick="abrirCadastroVenda()">
+          <i data-lucide="dollar-sign"></i> NOVA VENDA
+        </button>
+      </div>
+
+      <!-- 4. ABA PRODUTOS E SERVIÇOS -->
+      <div id="tab-produtos" class="tab-content hidden">
+        <div style="margin-bottom: 16px;">
+          <h3 style="color: var(--primary-color); margin-bottom: 10px; font-size:16px;">Catálogo de Produtos e Serviços</h3>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Cadastre itens com unidades (cm, unidade, metros) ou serviços prestados.</p>
+        </div>
+        <div id="produtos-list"></div>
+        <button class="fab" onclick="abrirCadastroProduto()">
+          <i data-lucide="package-plus"></i> NOVO ITEM
+        </button>
+      </div>
+
+      <!-- 5. ABA CONFIGURAÇÕES -->
+      <div id="tab-config" class="tab-content hidden">
+        <div class="summary-card">
+          <h3 style="color: var(--primary-color); margin-bottom: 14px;">Dados da Empresa</h3>
+          <div class="form-group">
+            <label class="form-label">Nome da Empresa</label>
+            <input type="text" class="input-underline" id="cfg-nome" placeholder="Ex: B&D Instalação">
+          </div>
+          <div class="form-group">
+            <label class="form-label">URL da Foto / Avatar</label>
+            <input type="text" class="input-underline" id="cfg-foto" placeholder="Link da imagem">
+          </div>
+          <div class="form-group">
+            <label class="form-label">CNPJ</label>
+            <input type="text" class="input-underline" id="cfg-cnpj" placeholder="00.000.000/0001-00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefone</label>
+            <input type="text" class="input-underline" id="cfg-telefone" placeholder="(00) 00000-0000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Funcionários</label>
+            <input type="text" class="input-underline" id="cfg-funcionarios" placeholder="Ex: João, Maria">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dono</label>
+            <input type="text" class="input-underline" id="cfg-dono" placeholder="Seu nome">
+          </div>
+          <button class="btn-action-primary" onclick="salvarConfiguracoesEmpresa()">Salvar Dados</button>
+        </div>
+
+        <div class="summary-card">
+          <h3 style="color: var(--primary-color); margin-bottom: 14px;">Aparência</h3>
+          <div class="summary-row" style="align-items: center; margin-bottom: 14px;">
+            <span>Modo Escuro / Claro</span>
+            <button class="card-btn-action btn-edit" onclick="alternarTema()" style="background: var(--card-border); padding: 8px 12px;">Alternar Tema</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cor Principal dos Botões</label>
+            <select class="custom-input-box" id="cfg-cor-tema" onchange="mudarCorTema(this.value)">
+              <option value="#00aaff">Azul Padrão</option>
+              <option value="#00e676">Verde Esmeralda</option>
+              <option value="#ff9100">Laranja Chamas</option>
+              <option value="#7c4dff">Roxo Neon</option>
+              <option value="#ff5252">Vermelho Carmesim</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <h3 style="color: var(--primary-color); margin-bottom: 14px;">Backup e Dados</h3>
+          <button class="btn-action-primary" onclick="exportarBackupTxt()" style="margin-bottom: 12px;">Salvar Backup no Dispositivo (.txt)</button>
+          
+          <label class="form-label" style="margin-top: 10px;">Importar Backup (Restaurar)</label>
+          <input type="file" id="input-import-backup" accept=".txt,.json" class="custom-input-box" onchange="importarBackup(event)" style="padding: 8px;">
+        </div>
+      </div>
+
+      <!-- TELA DE FORMULÁRIO: VENDA -->
+      <div id="tab-cad-venda" class="tab-content hidden">
+        <div class="form-group">
+          <div class="form-box" onclick="alterarDataVendaManual()">
+            <div class="form-box-title">Data da Venda</div>
+            <div class="form-box-value" id="venda-form-data">15/10/2026</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-box" onclick="abrirSeletorCliente()">
+            <div class="form-box-title">Cliente</div>
+            <div class="form-box-value" id="venda-form-cliente-nome">Nenhum cliente selecionado</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-box" onclick="abrirSeletorItemCatalogo()">
+            <div class="form-box-title">Produto ou Serviço do Catálogo</div>
+            <div class="form-box-value" id="venda-form-item-nome">Nenhum item selecionado</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valor da Venda (R$)</label>
+          <div class="custom-input-box">
+            <input type="text" id="venda-form-valor" value="R$ 0,00" oninput="mascaraMoeda(this)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Situação do Pagamento</label>
+          <label class="radio-option"><input type="radio" name="status_pag" value="total" checked><span>Pago o valor total</span></label>
+          <label class="radio-option"><input type="radio" name="status_pag" value="parcial"><span>Pagou parte do valor</span></label>
+          <label class="radio-option"><input type="radio" name="status_pag" value="nada"><span>Não pagou nada (Pendente)</span></label>
+        </div>
+        <div class="form-group" id="group-valor-parcial" style="display:none;">
+          <label class="form-label">Valor já pago parcialmente</label>
+          <div class="custom-input-box">
+            <input type="text" id="venda-form-valor-parcial" value="R$ 0,00" oninput="mascaraMoeda(this)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descrição / Observações</label>
+          <textarea class="text-area-box" id="venda-form-servico" placeholder="Ex: Instalação de câmera e cabo 10 metros"></textarea>
+        </div>
+      </div>
+
+      <!-- TELA DE FORMULÁRIO: CLIENTE -->
+      <div id="tab-cad-cliente" class="tab-content hidden">
+        <input type="text" class="input-underline" id="cliente-form-nome" placeholder="Nome do Cliente">
+        <input type="text" class="input-underline" id="cliente-form-telefone" placeholder="Telefone">
+        <label class="form-label" style="margin-top: 10px;">Anotações sobre o cliente</label>
+        <textarea class="text-area-box" id="cliente-form-notas"></textarea>
+      </div>
+
+      <!-- TELA DE FORMULÁRIO: PRODUTO / SERVIÇO -->
+      <div id="tab-cad-produto" class="tab-content hidden">
+        <div class="form-group">
+          <label class="form-label">Tipo de Item</label>
+          <select class="custom-input-box" id="prod-form-tipo">
+            <option value="produto">Produto</option>
+            <option value="servico">Serviço</option>
+          </select>
+        </div>
+        <input type="text" class="input-underline" id="prod-form-nome" placeholder="Nome do Produto ou Serviço">
+        <input type="text" class="input-underline" id="prod-form-categoria" placeholder="Categoria (Ex: Segurança, Cabos, Mão de Obra)">
+        <div class="form-group">
+          <label class="form-label">Unidade de Medida</label>
+          <select class="custom-input-box" id="prod-form-unidade">
+            <option value="unidade">Unidade (un)</option>
+            <option value="centimetros">Centímetros (cm)</option>
+            <option value="metros">Metros (m)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preço Padrão (R$)</label>
+          <div class="custom-input-box">
+            <input type="text" id="prod-form-preco" value="R$ 0,00" oninput="mascaraMoeda(this)">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navegação Inferior -->
+    <div class="nav-bottom" id="nav-bottom">
+      <button class="nav-item active" onclick="mudarAba('inicio')">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Início</span>
+      </button>
+      <button class="nav-item" onclick="mudarAba('clientes')">
+        <i data-lucide="users"></i>
+        <span>Clientes</span>
+      </button>
+      <button class="nav-item" onclick="mudarAba('vendas')">
+        <i data-lucide="receipt"></i>
+        <span>Vendas</span>
+      </button>
+      <button class="nav-item" onclick="mudarAba('produtos')">
+        <i data-lucide="package"></i>
+        <span>Produtos</span>
+      </button>
+      <button class="nav-item" onclick="mudarAba('config')">
+        <i data-lucide="settings"></i>
+        <span>Ajustes</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- MODAIS AUXILIARES -->
+  <div class="modal-overlay" id="modal-selecao">
+    <div class="modal-card">
+      <h3 id="modal-selecao-titulo">Selecione</h3>
+      <div id="modal-selecao-list"></div>
+      <button class="btn-action-primary" style="margin-top: 15px; margin-bottom: 0;" onclick="fecharModalSelecao()">CANCELAR</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-pendentes">
+    <div class="modal-card">
+      <h3 style="color: var(--danger-red);">Vendas Pendentes de Pagamento</h3>
+      <div id="modal-pendentes-list"></div>
+      <button class="btn-action-primary" style="margin-top: 15px; margin-bottom: 0;" onclick="fecharModalPendentes()">FECHAR</button>
+    </div>
+  </div>
+
+  <script>
+    // Estado do Banco de Dados Local
+    let db = {
+      empresa: {
+        nome: "B&D Instalação",
+        foto: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=150&auto=format&fit=crop&q=80",
+        cnpj: "45.123.456/0001-99",
+        telefone: "69 98400-0000",
+        funcionarios: "Davi, Caio",
+        dono: "Davi Felix",
+        darkMode: true,
+        corTema: "#00aaff"
+      },
+      clientes: [
+        { id: 1, nome: 'João maria', telefone: '69 9999-0001', notas: 'Cliente pontual' },
+        { id: 2, nome: 'Aribern câmera', telefone: '69 9999-0002', notas: '' }
+      ],
+      produtos: [
+        { id: 1, nome: 'Câmera IP Wi-Fi', categoria: 'Segurança', unidade: 'unidade', preco: 150.00, tipo: 'produto' },
+        { id: 2, nome: 'Instalação Técnica', categoria: 'Mão de Obra', unidade: 'unidade', preco: 80.00, tipo: 'servico' },
+        { id: 3, nome: 'Cabo de Rede UTP', categoria: 'Cabos', unidade: 'metros', preco: 3.50, tipo: 'produto' }
+      ],
+      vendas: [
+        { id: 101, clienteId: 1, clienteNome: 'João maria', data: '15/10/2026', timestamp: Date.now(), valor: 160.00, status: 'total', valorPago: 160.00, servico: 'Instalação de duas câmeras' },
+        { id: 102, clienteId: 2, clienteNome: 'Aribern câmera', data: '14/10/2026', timestamp: Date.now() - 50000, status: 'pendente', valorPago: 0.00, valor: 50.00, servico: 'Mudança da câmera' }
+      ]
+    };
+
+    let abaAtual = 'inicio';
+    let contextoForm = null; // 'venda', 'cliente', 'produto'
+    let editandoId = null;
+    let clienteSelecionadoTemp = null;
+    let itemCatalogoSelecionadoTemp = null;
+
+    // Carregar localStorage
+    if (localStorage.getItem('controle_vendas_pro_db')) {
+      try {
+        db = JSON.parse(localStorage.getItem('controle_vendas_pro_db'));
+      } catch(e) { console.error(e); }
+    }
+
+    function salvarEDevolver() {
+      localStorage.setItem('controle_vendas_pro_db', JSON.stringify(db));
+      aplicarConfiguracoesVisuais();
+      renderizarTudo();
+    }
+
+    function aplicarConfiguracoesVisuais() {
+      document.documentElement.style.setProperty('--primary-color', db.empresa.corTema || '#00aaff');
+      const container = document.getElementById('app-container');
+      if (db.empresa.darkMode) {
+        document.documentElement.style.setProperty('--bg-color', '#121212');
+        document.documentElement.style.setProperty('--card-bg', '#1e1e1e');
+        document.documentElement.style.setProperty('--card-border', '#2a2a2a');
+        document.documentElement.style.setProperty('--text-main', '#ffffff');
+        document.documentElement.style.setProperty('--header-bg', '#181818');
+      } else {
+        document.documentElement.style.setProperty('--bg-color', '#f4f6f8');
+        document.documentElement.style.setProperty('--card-bg', '#ffffff');
+        document.documentElement.style.setProperty('--card-border', '#e0e0e0');
+        document.documentElement.style.setProperty('--text-main', '#212121');
+        document.documentElement.style.setProperty('--header-bg', '#ffffff');
+      }
+      document.getElementById('dash-empresa-nome').textContent = db.empresa.nome;
+      document.getElementById('dash-dono-nome').textContent = `Dono: ${db.empresa.dono}`;
+      document.getElementById('dash-avatar').style.backgroundImage = `url('${db.empresa.foto}')`;
+    }
+
+    // Navegação de Telas
+    function mudarAba(aba) {
+      abaAtual = aba;
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById('back-btn').classList.add('hidden');
+      document.getElementById('save-btn').classList.add('hidden');
+      document.getElementById('nav-bottom').classList.remove('hidden');
+
+      if (aba === 'inicio') {
+        document.getElementById('tab-inicio').classList.remove('hidden');
+        document.querySelectorAll('.nav-item')[0].classList.add('active');
+        document.getElementById('app-title').textContent = 'Controle de Vendas Pro';
+      } else if (aba === 'clientes') {
+        document.getElementById('tab-clientes').classList.remove('hidden');
+        document.querySelectorAll('.nav-item')[1].classList.add('active');
+        document.getElementById('app-title').textContent = 'Gerenciar Clientes';
+      } else if (aba === 'vendas') {
+        document.getElementById('tab-vendas').classList.remove('hidden');
+        document.querySelectorAll('.nav-item')[2].classList.add('active');
+        document.getElementById('app-title').textContent = 'Histórico de Vendas';
+      } else if (aba === 'produtos') {
+        document.getElementById('tab-produtos').classList.remove('hidden');
+        document.querySelectorAll('.nav-item')[3].classList.add('active');
+        document.getElementById('app-title').textContent = 'Produtos e Serviços';
+      } else if (aba === 'config') {
+        document.getElementById('tab-config').classList.remove('hidden');
+        document.querySelectorAll('.nav-item')[4].classList.add('active');
+        document.getElementById('app-title').textContent = 'Configurações';
+        carregarConfigsForm();
+      }
+      renderizarTudo();
+    }
+
+    function abrirFormularioGenerico(titulo, abaId, contexto) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('nav-bottom').classList.add('hidden');
+      document.getElementById('back-btn').classList.remove('hidden');
+      document.getElementById('save-btn').classList.remove('hidden');
+      document.getElementById('app-title').textContent = titulo;
+      document.getElementById(abaId).classList.remove('hidden');
+      contextoForm = contexto;
+    }
+
+    function voltarTelaAnterior() {
+      mudarAba(abaAtual);
+    }
+
+    // Formulários
+    function abrirCadastroVenda(idVenda = null) {
+      editandoId = idVenda;
+      clienteSelecionadoTemp = null;
+      itemCatalogoSelecionadoTemp = null;
+      
+      if (idVenda) {
+        const v = db.vendas.find(x => x.id === idVenda);
+        if (v) {
+          const cli = db.clientes.find(c => c.id === v.clienteId);
+          clienteSelecionadoTemp = cli || { id: v.clienteId, nome: v.clienteNome };
+          document.getElementById('venda-form-cliente-nome').textContent = v.clienteNome;
+          document.getElementById('venda-form-data').textContent = v.data;
+          document.getElementById('venda-form-valor').value = `R$ ${v.valor.toFixed(2).replace('.', ',')}`;
+          document.getElementById('venda-form-servico').value = v.servico;
+          document.getElementById('venda-form-item-nome').textContent = 'Item personalizado';
+        }
+      } else {
+        const hoje = new Date().toLocaleDateString('pt-BR');
+        document.getElementById('venda-form-data').textContent = hoje;
+        document.getElementById('venda-form-cliente-nome').textContent = 'Nenhum cliente selecionado';
+        document.getElementById('venda-form-item-nome').textContent = 'Nenhum item selecionado';
+        document.getElementById('venda-form-valor').value = 'R$ 0,00';
+        document.getElementById('venda-form-servico').value = '';
+      }
+      abrirFormularioGenerico(idVenda ? 'Editar Venda' : 'Nova Venda', 'tab-cad-venda', 'venda');
+    }
+
+    function abrirCadastroCliente(idCliente = null) {
+      editandoId = idCliente;
+      if (idCliente) {
+        const c = db.clientes.find(x => x.id === idCliente);
+        if (c) {
+          document.getElementById('cliente-form-nome').value = c.nome;
+          document.getElementById('cliente-form-telefone').value = c.telefone;
+          document.getElementById('cliente-form-notas').value = c.notas || '';
+        }
+      } else {
+        document.getElementById('cliente-form-nome').value = '';
+        document.getElementById('cliente-form-telefone').value = '';
+        document.getElementById('cliente-form-notas').value = '';
+      }
+      abrirFormularioGenerico(idCliente ? 'Editar Cliente' : 'Novo Cliente', 'tab-cad-cliente', 'cliente');
+    }
+
+    function abrirCadastroProduto(idProd = null) {
+      editandoId = idProd;
+      if (idProd) {
+        const p = db.produtos.find(x => x.id === idProd);
+        if (p) {
+          document.getElementById('prod-form-nome').value = p.nome;
+          document.getElementById('prod-form-categoria').value = p.categoria;
+          document.getElementById('prod-form-tipo').value = p.tipo;
+          document.getElementById('prod-form-unidade').value = p.unidade;
+          document.getElementById('prod-form-preco').value = `R$ ${p.preco.toFixed(2).replace('.', ',')}`;
+        }
+      } else {
+        document.getElementById('prod-form-nome').value = '';
+        document.getElementById('prod-form-categoria').value = '';
+        document.getElementById('prod-form-preco').value = 'R$ 0,00';
+      }
+      abrirFormularioGenerico(idProd ? 'Editar Item' : 'Novo Produto/Serviço', 'tab-cad-produto', 'produto');
+    }
+
+    function salvarFormularioAtual() {
+      if (contextoForm === 'venda') {
+        const valorRaw = document.getElementById('venda-form-valor').value;
+        const valorNum = parseFloat(valorRaw.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+        const statusPag = document.querySelector('input[name="status_pag"]:checked').value;
+        const servico = document.getElementById('venda-form-servico').value || 'Serviço prestado';
+        const dataVenda = document.getElementById('venda-form-data').textContent;
+
+        if (!clienteSelecionadoTemp) {
+          alert('Selecione um cliente.');
+          return;
+        }
+
+        let valorPago = 0;
+        if (statusPag === 'total') valorPago = valorNum;
+        else if (statusPag === 'parcial') {
+          const parcialRaw = document.getElementById('venda-form-valor-parcial').value;
+          valorPago = parseFloat(parcialRaw.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+        }
+
+        if (editandoId) {
+          const idx = db.vendas.findIndex(v => v.id === editandoId);
+          if (idx !== -1) {
+            // Verificar limite de 24 horas para edição
+            const diffHoras = (Date.now() - db.vendas[idx].timestamp) / (1000 * 60 * 60);
+            if (diffHoras > 24) {
+              alert('Esta venda foi feita há mais de 24 horas e não pode ser editada.');
+              return;
+            }
+            db.vendas[idx].clienteId = clienteSelecionadoTemp.id;
+            db.vendas[idx].clienteNome = clienteSelecionadoTemp.nome;
+            db.vendas[idx].valor = valorNum;
+            db.vendas[idx].status = statusPag;
+            db.vendas[idx].valorPago = valorPago;
+            db.vendas[idx].servico = servico;
+          }
+        } else {
+          const nova = {
+            id: Date.now(),
+            clienteId: clienteSelecionadoTemp.id,
+            clienteNome: clienteSelecionadoTemp.nome,
+            data: dataVenda,
+            timestamp: Date.now(),
+            valor: valorNum,
+            status: statusPag,
+            valorPago: valorPago,
+            servico: servico
+          };
+          db.vendas.unshift(nova);
+        }
+        salvarEDevolver();
+        mudarAba('vendas');
+
+      } else if (contextoForm === 'cliente') {
+        const nome = document.getElementById('cliente-form-nome').value.trim();
+        const telefone = document.getElementById('cliente-form-telefone').value.trim() || 'Não informado';
+        const notas = document.getElementById('cliente-form-notas').value.trim();
+
+        if (!nome) {
+          alert('Informe o nome do cliente.');
+          return;
+        }
+
+        if (editandoId) {
+          const c = db.clientes.find(x => x.id === editandoId);
+          if (c) {
+            c.nome = nome;
+            c.telefone = telefone;
+            c.notas = notas;
+          }
+        } else {
+          db.clientes.unshift({ id: Date.now(), nome, telefone, notas });
+        }
+        salvarEDevolver();
+        mudarAba('clientes');
+
+      } else if (contextoForm === 'produto') {
+        const nome = document.getElementById('prod-form-nome').value.trim();
+        const categoria = document.getElementById('prod-form-categoria').value.trim() || 'Geral';
+        const tipo = document.getElementById('prod-form-tipo').value;
+        const unidade = document.getElementById('prod-form-unidade').value;
+        const precoRaw = document.getElementById('prod-form-preco').value;
+        const preco = parseFloat(precoRaw.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+
+        if (!nome) {
+          alert('Informe o nome do item.');
+          return;
+        }
+
+        if (editandoId) {
+          const p = db.produtos.find(x => x.id === editandoId);
+          if (p) {
+            p.nome = nome; p.categoria = categoria; p.tipo = tipo; p.unidade = unidade; p.preco = preco;
+          }
+        } else {
+          db.produtos.unshift({ id: Date.now(), nome, categoria, tipo, unidade, preco });
+        }
+        salvarEDevolver();
+        mudarAba('produtos');
+      }
+    }
+
+    // Exclusões e Ações
+    function excluirVenda(id) {
+      if (confirm('Deseja realmente excluir esta venda?')) {
+        db.vendas = db.vendas.filter(v => v.id !== id);
+        salvarEDevolver();
+      }
+    }
+
+    function excluirCliente(id) {
+      if (confirm('Deseja excluir este cliente?')) {
+        db.clientes = db.clientes.filter(c => c.id !== id);
+        salvarEDevolver();
+      }
+    }
+
+    function excluirProduto(id) {
+      if (confirm('Deseja excluir este item do catálogo?')) {
+        db.produtos = db.produtos.filter(p => p.id !== id);
+        salvarEDevolver();
+      }
+    }
+
+    // Modais de Seleção
+    function abrirSeletorCliente() {
+      const list = document.getElementById('modal-selecao-list');
+      list.innerHTML = '';
+      document.getElementById('modal-selecao-titulo').textContent = 'Selecionar Cliente';
+      db.clientes.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'select-item';
+        div.innerHTML = `<span>${c.nome}</span><span style="color:var(--text-muted);">${c.telefone}</span>`;
+        div.onclick = () => {
+          clienteSelecionadoTemp = c;
+          document.getElementById('venda-form-cliente-nome').textContent = c.nome;
+          fecharModalSelecao();
+        };
+        list.appendChild(div);
+      });
+      document.getElementById('modal-selecao').style.display = 'flex';
+    }
+
+    function abrirSeletorItemCatalogo() {
+      const list = document.getElementById('modal-selecao-list');
+      list.innerHTML = '';
+      document.getElementById('modal-selecao-titulo').textContent = 'Selecionar Produto ou Serviço';
+      db.produtos.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'select-item';
+        div.innerHTML = `<span>${p.nome} (${p.unidade})</span><span style="color:var(--green-paid);">R$ ${p.preco.toFixed(2).replace('.', ',')}</span>`;
+        div.onclick = () => {
+          itemCatalogoSelecionadoTemp = p;
+          document.getElementById('venda-form-item-nome').textContent = p.nome;
+          document.getElementById('venda-form-valor').value = `R$ ${p.preco.toFixed(2).replace('.', ',')}`;
+          document.getElementById('venda-form-servico').value = `${p.tipo === 'produto' ? 'Produto' : 'Serviço'}: ${p.nome}`;
+          fecharModalSelecao();
+        };
+        list.appendChild(div);
+      });
+      document.getElementById('modal-selecao').style.display = 'flex';
+    }
+
+    function fecharModalSelecao() {
+      document.getElementById('modal-selecao').style.display = 'none';
+    }
+
+    // Modal de Vendas Pendentes (Interativo)
+    function abrirModalPendentes() {
+      const list = document.getElementById('modal-pendentes-list');
+      list.innerHTML = '';
+      const pendentes = db.vendas.filter(v => v.status !== 'total' && (v.valor - (v.valorPago || 0)) > 0);
+
+      if (pendentes.length === 0) {
+        list.innerHTML = '<p style="color:var(--text-muted); padding: 10px;">Nenhuma venda pendente no momento!</p>';
+      } else {
+        pendentes.forEach(v => {
+          const rest = v.valor - (v.valorPago || 0);
+          const div = document.createElement('div');
+          div.className = 'item-card';
+          div.innerHTML = `
+            <div class="item-user"><span>${v.clienteNome}</span><span style="color:var(--danger-red);">Pendente: R$ ${rest.toFixed(2).replace('.', ',')}</span></div>
+            <div class="item-desc">${v.servico} (Total: R$ ${v.valor.toFixed(2).replace('.', ',')})</div>
+            <div class="card-actions">
+              <button class="card-btn-action btn-edit" onclick="quitarVenda(${v.id}, 'total')">Receber Total</button>
+              <button class="card-btn-action" style="color:var(--primary-color);" onclick="quitarVendaParcialPrompt(${v.id})">Valor Parcial</button>
+              <button class="card-btn-action btn-delete" onclick="excluirVenda(${v.id}); abrirModalPendentes();">Apagar</button>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+      }
+      document.getElementById('modal-pendentes').style.display = 'flex';
+    }
+
+    function fecharModalPendentes() {
+      document.getElementById('modal-pendentes').style.display = 'none';
+      renderizarTudo();
+    }
+
+    function quitarVenda(id, tipo) {
+      const v = db.vendas.find(x => x.id === id);
+      if (v) {
+        v.status = 'total';
+        v.valorPago = v.valor;
+        salvarEDevolver();
+        abrirModalPendentes();
+      }
+    }
+
+    function quitarVendaParcialPrompt(id) {
+      const v = db.vendas.find(x => x.id === id);
+      if (v) {
+        const resto = v.valor - (v.valorPago || 0);
+        const input = prompt(`Informe quanto o cliente pagou agora (Restante: R$ ${resto.toFixed(2)}):`, '0,00');
+        if (input) {
+          const val = parseFloat(input.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+          v.valorPago = (v.valorPago || 0) + val;
+          if (v.valorPago >= v.valor) {
+            v.status = 'total';
+            v.valorPago = v.valor;
+          } else {
+            v.status = 'parcial';
+          }
+          salvarEDevolver();
+          abrirModalPendentes();
+        }
+      }
+    }
+
+    // Configurações Empresa
+    function carregarConfigsForm() {
+      document.getElementById('cfg-nome').value = db.empresa.nome;
+      document.getElementById('cfg-foto').value = db.empresa.foto;
+      document.getElementById('cfg-cnpj').value = db.empresa.cnpj;
+      document.getElementById('cfg-telefone').value = db.empresa.telefone;
+      document.getElementById('cfg-funcionarios').value = db.empresa.funcionarios;
+      document.getElementById('cfg-dono').value = db.empresa.dono;
+      document.getElementById('cfg-cor-tema').value = db.empresa.corTema || '#00aaff';
+    }
+
+    function salvarConfiguracoesEmpresa() {
+      db.empresa.nome = document.getElementById('cfg-nome').value || 'Empresa';
+      db.empresa.foto = document.getElementById('cfg-foto').value || '';
+      db.empresa.cnpj = document.getElementById('cfg-cnpj').value || '';
+      db.empresa.telefone = document.getElementById('cfg-telefone').value || '';
+      db.empresa.funcionarios = document.getElementById('cfg-funcionarios').value || '';
+      db.empresa.dono = document.getElementById('cfg-dono').value || '';
+      salvarEDevolver();
+      alert('Configurações salvas com sucesso!');
+    }
+
+    function alternarTema() {
+      db.empresa.darkMode = !db.empresa.darkMode;
+      salvarEDevolver();
+    }
+
+    function mudarCorTema(cor) {
+      db.empresa.corTema = cor;
+      salvarEDevolver();
+    }
+
+    // Backup e Restauração em Arquivo de Texto (Downloads)
+    function exportarBackupTxt() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `backup_controle_vendas_${new Date().toISOString().slice(0,10)}.txt`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      alert('Arquivo de backup gerado para download!');
+    }
+
+    function importarBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (imported && imported.vendas && imported.clientes) {
+            db = imported;
+            salvarEDevolver();
+            alert('Backup importado com sucesso!');
+            mudarAba('inicio');
+          } else {
+            alert('Arquivo de backup inválido.');
+          }
+        } catch(err) {
+          alert('Erro ao ler o arquivo de backup.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Máscara de Moeda
+    function mascaraMoeda(input) {
+      let value = input.value.replace(/\D/g, '');
+      value = (value / 100).toFixed(2) + '';
+      value = value.replace('.', ',');
+      value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+      input.value = 'R$ ' + value;
+    }
+
+    function alterarDataVendaManual() {
+      const nova = prompt('Informe a data da venda (DD/MM/AAAA):', document.getElementById('venda-form-data').textContent);
+      if (nova) document.getElementById('venda-form-data').textContent = nova;
+    }
+
+    // Listener para o Radio de Status de Pagamento
+    document.querySelectorAll('input[name="status_pag"]').forEach(radio => {
+      radio.onchange = (e) => {
+        document.getElementById('group-valor-parcial').style.display = e.target.value === 'parcial' ? 'block' : 'none';
+      };
+    });
+
+    // Renderização de Dados
+    function renderizarTudo() {
+      aplicarConfiguracoesVisuais();
+      renderizarDashboard();
+      renderizarClientes();
+      renderizarVendas();
+      renderizarProdutos();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function renderizarDashboard() {
+      const periodo = document.getElementById('select-periodo').value;
+      
+      // Filtrar vendas por período simulado
+      let vendasFiltradas = db.vendas;
+      // Aqui consideramos todas ou agrupamentos simples
+      const totalVendas = vendasFiltradas.length;
+      const pendentesCount = vendasFiltradas.filter(v => v.status !== 'total' && (v.valor - (v.valorPago || 0)) > 0).length;
+      
+      const faturamento = vendasFiltradas.reduce((acc, v) => acc + (v.valorPago || 0), 0);
+      const valorPendente = vendasFiltradas.reduce((acc, v) => acc + (v.status !== 'total' ? (v.valor - (v.valorPago || 0)) : 0), 0);
+      const custos = faturamento * 0.3;
+      const lucro = faturamento - custos;
+
+      document.getElementById('dash-total-vendas').textContent = totalVendas;
+      document.getElementById('dash-pendentes').textContent = pendentesCount;
+      document.getElementById('dash-faturamento').textContent = `R$ ${faturamento.toFixed(2).replace('.', ',')}`;
+      document.getElementById('dash-custos').textContent = `R$ ${custos.toFixed(2).replace('.', ',')}`;
+      document.getElementById('dash-lucro').textContent = `R$ ${lucro.toFixed(2).replace('.', ',')}`;
+      document.getElementById('dash-valor-pendente').textContent = `R$ ${valorPendente.toFixed(2).replace('.', ',')}`;
+      
+      document.getElementById('dash-total-clientes').textContent = db.clientes.length;
+      document.getElementById('dash-clientes-pendentes').textContent = pendentesCount > 0 ? pendentesCount : 0;
+    }
+
+    function renderizarClientes() {
+      const container = document.getElementById('clientes-list');
+      container.innerHTML = '';
+      db.clientes.forEach(c => {
+        const vendasC = db.vendas.filter(v => v.clienteId === c.id);
+        const totalGasto = vendasC.reduce((acc, v) => acc + v.valor, 0);
+
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div class="item-user">
+            <i data-lucide="user" style="width: 20px;"></i>
+            <span>${c.nome}</span>
+            <span class="item-value">R$ ${totalGasto.toFixed(2).replace('.', ',')}</span>
+          </div>
+          <div class="item-desc">Tel: ${c.telefone} ${c.notas ? ' | ' + c.notas : ''}</div>
+          <div class="card-actions">
+            <button class="card-btn-action btn-edit" onclick="abrirCadastroCliente(${c.id})"><i data-lucide="edit" style="width:14px;"></i> Alterar</button>
+            <button class="card-btn-action btn-delete" onclick="excluirCliente(${c.id})"><i data-lucide="trash" style="width:14px;"></i> Excluir</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderizarVendas() {
+      const container = document.getElementById('vendas-list');
+      container.innerHTML = '';
+      db.vendas.forEach(v => {
+        const diffHoras = (Date.now() - (v.timestamp || Date.now())) / (1000 * 60 * 60);
+        const podeEditar = diffHoras <= 24;
+        const pagoTotal = v.status === 'total';
+
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div class="item-header">
+            <span class="item-date">${v.data}</span>
+            <span class="item-status" style="color: ${pagoTotal ? 'var(--green-paid)' : 'var(--danger-red)'};">
+              ${pagoTotal ? 'Pago Total' : (v.status === 'parcial' ? 'Parcial' : 'Pendente')}
+            </span>
+          </div>
+          <div class="item-user">
+            <i data-lucide="user" style="width: 18px;"></i>
+            <span>${v.clienteNome}</span>
+            <span class="item-value">R$ ${v.valor.toFixed(2).replace('.', ',')}</span>
+          </div>
+          <div class="item-desc">${v.servico}</div>
+          <div class="card-actions">
+            ${podeEditar ? `<button class="card-btn-action btn-edit" onclick="abrirCadastroVenda(${v.id})"><i data-lucide="edit" style="width:14px;"></i> Editar (24h)</button>` : '<span style="font-size:11px; color:var(--text-muted); align-self:center;">Prazo 24h expirado</span>'}
+            <button class="card-btn-action btn-delete" onclick="excluirVenda(${v.id})"><i data-lucide="trash" style="width:14px;"></i> Excluir</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderizarProdutos() {
+      const container = document.getElementById('produtos-list');
+      container.innerHTML = '';
+      db.produtos.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div class="item-user">
+            <span>${p.nome}</span>
+            <span class="item-value">R$ ${p.preco.toFixed(2).replace('.', ',')}</span>
+          </div>
+          <div class="item-desc">Categoria: ${p.categoria} | Tipo: ${p.tipo} | Unidade: ${p.unidade}</div>
+          <div class="card-actions">
+            <button class="card-btn-action btn-edit" onclick="abrirCadastroProduto(${p.id})"><i data-lucide="edit" style="width:14px;"></i> Alterar</button>
+            <button class="card-btn-action btn-delete" onclick="excluirProduto(${p.id})"><i data-lucide="trash" style="width:14px;"></i> Excluir</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Inicialização ao carregar
+    window.addEventListener('DOMContentLoaded', () => {
+      renderizarTudo();
+    });
+  </script>
+</body>
+</html>
